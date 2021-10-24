@@ -16,7 +16,7 @@ export default class ColecaoCliente implements ClienteRepositorio{
             return new Cliente(dados.nome, dados.idade, snapshot.id)
         }
     }
-
+ 
     async salvar(cliente: Cliente): Promise<Cliente>{
         if(cliente?.id){
             await this.colecao().doc(cliente.id).set(cliente)

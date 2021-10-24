@@ -10,47 +10,12 @@ import { useEffect, useState } from 'react'
 import { loadGetInitialProps } from 'next/dist/shared/lib/utils'
 import ClienteRepositorio from '../core/ClienteRepositorio'
 import ColecaoCliente from '../backend/db/ColecaoCliente'
+import useClientes from '../hooks/useClientes'
 
 export default function Home() {
 
 
-  const repo: ClienteRepositorio = new ColecaoCliente()
-
-  const [visivel, setVisivel] = useState<'tabela' | 'form'>('tabela')
-  const [clientes, setClientes] = useState<Cliente[]>([])
-  const [cliente, setCliente] = useState<Cliente>(Cliente.vazio())
-
-  useEffect(obterTodos, [])
-
-  function obterTodos(){
-      repo.obterTodos().then(clientes => {
-          setClientes(clientes)
-          setVisivel('tabela')
-      })
-  }
-
-  function clienteSelecionado(cliente: Cliente){
-    console.log(cliente)
-    setCliente(cliente)
-    setVisivel('form')
-    
-  } 
-  function clienteExcluido(cliente: Cliente){
-    console.log(`Excluir ... ${cliente}`)
-  } 
-
-  async function salvarCliente(cliente: Cliente){
-    console.log(cliente)
-    await repo.salvar(cliente)
-    obterTodos()
-    
-  }
-
-  function novoCliente(cliente: Cliente){
-    setCliente(Cliente.vazio())
-    setVisivel('form')
-  }
- 
+  const {novoCliente, selecionarCliente, excluirCliente, salvarCliente, cliente, clientes, tabelaVisivel, exibirTabela} = useClientes()
 
   return (
     <div className={`
@@ -60,7 +25,7 @@ export default function Home() {
     `}>
       <Layout titulo='Cadastro'>
 
-{visivel === 'tabela' ? (
+{tabelaVisivel ? (
    <>
    <div className={`flex justify-end`}>       
        <Botao cor='green' clasName='mb-4'
@@ -70,15 +35,15 @@ export default function Home() {
         
      </div>
      <Table clientes={clientes} 
-       clienteSelecionado={clienteSelecionado} 
-       clienteExcluido={clienteExcluido}></Table>
+       clienteSelecionado={selecionarCliente} 
+       clienteExcluido={excluirCliente}></Table>
  </>
 
 ):(
   <Formulario 
     cliente={cliente}
     clienteMudou={salvarCliente}
-    cancelado={() => setVisivel('tabela')}
+    cancelado={exibirTabela}
   />
 )}
      
